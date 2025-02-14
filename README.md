@@ -1,85 +1,261 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Task Manager API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Overview
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This Task Manager API is built using NestJS, a progressive Node.js framework, with MongoDB as the database. The application follows a modular architecture with separate modules for authentication, task management, and user management. Key design decisions include:
 
-## Description
+- **Modular Architecture**: Separate modules for auth, tasks, and users for better code organization and maintainability
+- **MongoDB Integration**: Using Mongoose ODM for robust data modeling and validation
+- **JWT Authentication**: Secure authentication system with token-based access
+- **Testing**: Comprehensive E2E tests using Jest and Supertest
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Setup Instructions
 
-## Project setup
+1. **Prerequisites**
+
+   - Node.js (v14 or higher)
+   - MongoDB (local instance or connection string)
+
+2. **Installation**
+
+   ```bash
+   # Clone the repository
+   git clone [repository-url]
+   cd naria-api
+
+   # Install dependencies
+   npm install
+   ```
+
+3. **Configuration**
+
+   - Create a `.env` file in the root directory
+   - Add necessary environment variables:
+     ```
+     MONGODB_URI=your_mongodb_connection_string
+     JWT_SECRET=your_jwt_secret
+     ```
+
+4. **Running the Application**
+
+   ```bash
+   # Development mode
+   npm run start:dev
+
+   # Production mode
+   npm run build
+   npm run start:prod
+   ```
+
+## API Documentation
+
+### Authentication Endpoints
+
+#### POST /auth/register
+
+- **Description**: Register a new user
+- **Request Body**:
+  ```json
+  {
+    "name": "string",
+    "email": "string",
+    "password": "string"
+  }
+  ```
+- **Response Body**:
+  ```json
+  {
+    "user": {
+      "_id": "string",
+      "name": "string",
+      "email": "string",
+      "createdAt": "ISO date string",
+      "updatedAt": "ISO date string"
+    },
+    "token": "JWT token string"
+  }
+  ```
+
+#### POST /auth/login
+
+- **Description**: Login with existing credentials
+- **Request Body**:
+  ```json
+  {
+    "email": "string",
+    "password": "string"
+  }
+  ```
+- **Response Body**:
+  ```json
+  {
+    "user": {
+      "_id": "string",
+      "name": "string",
+      "email": "string",
+      "createdAt": "ISO date string",
+      "updatedAt": "ISO date string"
+    },
+    "token": "JWT token string"
+  }
+  ```
+
+### Task Management Endpoints
+
+#### GET /tasks
+
+- **Description**: Get all tasks for authenticated user
+- **Authentication**: Required (JWT token)
+- **Response Body**:
+  ```json
+  [
+    {
+      "_id": "string",
+      "title": "string",
+      "description": "string",
+      "status": "pending" | "completed",
+      "dueDate": "ISO date string",
+      "userId": "string",
+      "createdAt": "ISO date string",
+      "updatedAt": "ISO date string"
+    }
+  ]
+  ```
+
+#### POST /tasks
+
+- **Description**: Create a new task
+- **Authentication**: Required (JWT token)
+- **Request Body**:
+  ```json
+  {
+    "title": "string",
+    "description": "string",
+    "dueDate": "ISO date string"
+  }
+  ```
+- **Response Body**:
+  ```json
+  {
+    "_id": "string",
+    "title": "string",
+    "description": "string",
+    "status": "pending",
+    "dueDate": "ISO date string",
+    "userId": "string",
+    "createdAt": "ISO date string",
+    "updatedAt": "ISO date string"
+  }
+  ```
+
+#### PUT /tasks/:id
+
+- **Description**: Update existing task
+- **Authentication**: Required (JWT token)
+- **Request Body**:
+  ```json
+  {
+    "title": "string",
+    "description": "string",
+    "status": "pending" | "completed",
+    "dueDate": "ISO date string"
+  }
+  ```
+- **Response Body**:
+  ```json
+  {
+    "_id": "string",
+    "title": "string",
+    "description": "string",
+    "status": "pending" | "completed",
+    "dueDate": "ISO date string",
+    "userId": "string",
+    "createdAt": "ISO date string",
+    "updatedAt": "ISO date string"
+  }
+  ```
+
+#### DELETE /tasks/:id
+
+- **Description**: Delete a task
+- **Authentication**: Required (JWT token)
+- **Response**: HTTP 204 No Content
+
+### User Management Endpoints
+
+#### GET /users/profile
+
+- **Description**: Get user profile
+- **Authentication**: Required (JWT token)
+- **Response Body**:
+  ```json
+  {
+    "_id": "string",
+    "name": "string",
+    "email": "string",
+    "createdAt": "ISO date string",
+    "updatedAt": "ISO date string"
+  }
+  ```
+
+#### PUT /users/profile
+
+- **Description**: Update user profile
+- **Authentication**: Required (JWT token)
+- **Request Body**:
+  ```json
+  {
+    "name": "string",
+    "email": "string"
+  }
+  ```
+- **Response Body**:
+  ```json
+  {
+    "_id": "string",
+    "name": "string",
+    "email": "string",
+    "createdAt": "ISO date string",
+    "updatedAt": "ISO date string"
+  }
+  ```
+
+## Security Measures
+
+1. **Password Security**
+
+   - Passwords are hashed using bcrypt before storage
+   - Salt rounds are automatically generated for each password
+
+2. **Authentication**
+
+   - JWT (JSON Web Tokens) for stateless authentication
+   - Tokens are required for protected endpoints
+   - Token validation on each protected request
+
+3. **Request Validation**
+
+   - Input validation for all endpoints
+   - MongoDB ObjectId validation for task operations
+   - Date format validation for task due dates
+
+4. **Error Handling**
+   - Proper error responses with appropriate HTTP status codes
+   - Validation errors return detailed messages
+   - Generic error messages for security-sensitive operations
+
+## Testing
+
+The application includes comprehensive end-to-end tests:
 
 ```bash
-$ npm install
+# Run e2e tests
+npm run test:e2e
+
+# Run unit tests
+npm run test
 ```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
 
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
