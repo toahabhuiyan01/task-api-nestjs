@@ -87,7 +87,7 @@ export class AuthService {
 
   async resetPassword(
     userId: string,
-    oldPassword: string,
+    currentPassword: string,
     newPassword: string,
   ) {
     const user = await this.userModel.findById(userId);
@@ -95,7 +95,7 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
-    const isValidPassword = await user.comparePassword(oldPassword);
+    const isValidPassword = await user.comparePassword(currentPassword);
     if (!isValidPassword) {
       throw new UnauthorizedException('Current password is incorrect');
     }

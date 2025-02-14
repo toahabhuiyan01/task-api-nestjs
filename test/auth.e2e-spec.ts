@@ -107,7 +107,7 @@ describe('Auth (e2e)', () => {
         .post('/auth/reset-password')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          oldPassword: testUser.password,
+          currentPassword: testUser.password,
           newPassword,
         })
         .expect(200);

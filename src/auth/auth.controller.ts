@@ -46,7 +46,7 @@ export class AuthController {
   ) {
     return this.authService.resetPassword(
       req.user.userId,
-      resetPasswordDto.oldPassword,
+      resetPasswordDto.currentPassword,
       resetPasswordDto.newPassword,
     );
   }

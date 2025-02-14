@@ -38,25 +38,75 @@ export class UsersController {
 
   @Put('profile')
   @HttpCode(200)
-  async updateProfile(@Request() req, @Body() updateDto: { name: string }) {
-    if (
-      !updateDto.name ||
-      typeof updateDto.name !== 'string' ||
-      updateDto.name.trim().length === 0
-    ) {
-      throw new BadRequestException(
-        'Name is required and must be a non-empty string',
-      );
-    }
-
-    const user = await this.userModel.findByIdAndUpdate(
-      req.user.userId,
-      { $set: { name: updateDto.name.trim() } },
-      { new: true },
-    );
+  async updateProfile(
+    @Request() req,
+    @Body()
+    updateDto: {
+      name?: string;
+      email?: string;
+      currentPassword?: string;
+      newPassword?: string;
+    },
+  ) {
+    const user = await this.userModel.findById(req.user.userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return { user: this.sanitizeUser(user) };
+
+    if (updateDto.name !== undefined) {
+      if (
+        typeof updateDto.name !== 'string' ||
+        updateDto.name.trim().length === 0
+      ) {
+        throw new BadRequestException('Name must be a non-empty string');
+      }
+      user.name = updateDto.name.trim();
+    }
+
+    if (updateDto.email !== undefined) {
+      if (
+        typeof updateDto.email !== 'string' ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateDto.email)
+      ) {
+        throw new BadRequestException('Invalid email format');
+      }
+
+      const existingUser = await this.userModel.findOne({
+        email: updateDto.email.toLowerCase(),
+        _id: { $ne: user._id },
+      });
+
+      if (existingUser) {
+        throw new BadRequestException('Email is already registered');
+      }
+
+      user.email = updateDto.email.toLowerCase();
+    }
+
+    if (
+      updateDto.currentPassword !== undefined ||
+      updateDto.newPassword !== undefined
+    ) {
+      if (!updateDto.currentPassword || !updateDto.newPassword) {
+        throw new BadRequestException(
+          'Both old and new passwords are required',
+        );
+      }
+
+      const isValidPassword = await user.comparePassword(
+        updateDto.currentPassword,
+      );
+      if (!isValidPassword) {
+        throw new BadRequestException('Current password is incorrect');
+      }
+
+      user.password = updateDto.newPassword;
+    }
+
+    await user.save();
+    return {
+      user: this.sanitizeUser(user),
+      message: 'Profile updated successfully',
+    };
   }
 }
